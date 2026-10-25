@@ -9,8 +9,9 @@ export default defineConfig({
     inlineStylesheets: 'always',
   },
   compressHTML: true,
+  // internal links are fetched on hover/touch so the next page opens instantly
   prefetch: {
-    prefetchAll: false,
+    prefetchAll: true,
     defaultStrategy: 'hover',
   },
 });

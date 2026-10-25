@@ -82,7 +82,7 @@ const more = (s: string, n = 150) => (s.length > n ? s.slice(0, s.lastIndexOf(' 
   /* diagonal corner ribbon (top-left in RTL) */
   .ribbon { position: absolute; z-index: 1; top: 22px; left: -46px; width: 180px; padding: 4px 0; transform: rotate(-45deg); background: var(--cta); color: #fff; font-size: .85rem; font-weight: 800; text-align: center; box-shadow: 0 2px 6px rgb(0 0 0 / 25%); }
   .content { margin-top: 40px; background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: clamp(20px, 3vw, 40px); }
-  .info { background: #eceef1; margin-top: 48px; padding-block: 44px; border-top: 4px solid #d5d9de; }
+  .info { margin-top: 48px; padding-block: 44px 8px; }
   .info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
   .info-card img { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; border-radius: 2px; }
   .info-card h3 { margin: 16px 0 6px; font-size: 1.2rem; }

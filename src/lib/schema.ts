@@ -1,5 +1,14 @@
 import { SITE, absUrl } from './site';
-import { breadcrumbs, TOPIC_NAMES, type Page } from './content';
+import { breadcrumbs, pages, TOPIC_NAMES, type Page } from './content';
+
+// Every service page, so search and AI engines can map the full offering to the business
+const offerCatalog = {
+  '@type': 'OfferCatalog',
+  name: 'שירותי אבטחה',
+  itemListElement: pages
+    .filter((x) => x.type === 'service')
+    .map((x) => ({ '@type': 'Offer', itemOffered: { '@type': 'Service', name: x.label, url: absUrl(x.path) } })),
+};
 
 const ORG_ID = `${SITE.url}/#organization`;
 const SITE_ID = `${SITE.url}/#website`;
@@ -29,6 +38,9 @@ export function pageSchema(p: Page) {
       priceRange: '₪₪',
       address: { '@type': 'PostalAddress', addressCountry: 'IL' },
       areaServed: { '@type': 'Country', name: 'Israel' },
+      contactPoint: { '@type': 'ContactPoint', telephone: SITE.phoneIntl, email: SITE.email, contactType: 'customer service', areaServed: 'IL', availableLanguage: ['he'] },
+      knowsAbout: ['מצלמות אבטחה', 'מערכות אזעקה', 'אינטרקום', 'מצלמות IP', 'מעגל סגור', 'קודן לדלת', 'גלאי עשן', 'נקודות רשת ותקשורת'],
+      hasOfferCatalog: offerCatalog,
     },
     { '@type': 'WebSite', '@id': SITE_ID, url: SITE.url, name: SITE.nameEn, alternateName: SITE.name, publisher: { '@id': ORG_ID }, inLanguage: 'he-IL' },
     {

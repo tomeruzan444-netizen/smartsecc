@@ -18,6 +18,9 @@ const showToc = page.hasToc || page.toc.length >= 4;
   <article class="content">
     {showToc && <Toc items={page.toc} variant="inline" />}
     <Blocks blocks={page.blocks} />
+    {page.modified && (
+      <p class="updated">עודכן לאחרונה: <time datetime={page.modified}>{new Date(page.modified).toLocaleDateString('he-IL', { day: 'numeric', month: 'long', year: 'numeric' })}</time> · צוות סמארטסק</p>
+    )}
   </article>
   <Sidebar page={page} />
 </div>
@@ -28,6 +31,7 @@ const showToc = page.hasToc || page.toc.length >= 4;
   .layout { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 36px; padding-top: 40px; align-items: start; }
   .content { background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: clamp(20px, 3vw, 40px); min-width: 0; box-shadow: 0 1px 3px rgb(0 0 0 / 5%); }
   .content :global(h2) { color: var(--blue-dark); }
+  .updated { margin: 28px 0 0; padding-top: 14px; border-top: 1px solid var(--line); color: var(--muted); font-size: .9rem; }
   @media (max-width: 1024px) { .layout { grid-template-columns: 1fr; } }
   @media (max-width: 640px) { .content { border-radius: 0; border-inline: 0; margin-inline: -16px; } }
 </style>

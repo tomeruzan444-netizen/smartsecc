@@ -42,7 +42,7 @@ const short = (t: string) => t.split(/\s+[–-]\s+/)[0];
       </ul>
     </nav>
 
-    <a class="phone" href={SITE.phoneHref}>
+    <a class="phone" href={SITE.phoneHref} aria-label={`להזמנות חייגו ${SITE.phone}`}>
       <span class="phone-ico"><Icon name="phone" /></span>
       <span class="phone-txt"><small>להזמנות חייגו</small><strong>{SITE.phone}</strong></span>
     </a>

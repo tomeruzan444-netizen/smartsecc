@@ -14,6 +14,8 @@
 | פונט | Google Fonts חיצוני | Assistant מקומי, ‎7KB לעברית, preload |
 | Schema | Rank Math + Product עם ביקורות עצמיות ותיאור של עסק אחר | LocalBusiness, Service, BreadcrumbList, FAQPage, WebPage |
 | נגישות | – | HTML סמנטי, skip-link, ניווט מקלדת, ניגודיות AA |
+| Lighthouse (מובייל) | – | ביצועים 99 · נגישות 100 · Best Practices 100 · SEO 100 · CLS 0 |
+| מנועי חיפוש AI | – | `llms.txt`, הרשאה מפורשת ל-GPTBot / ClaudeBot / PerplexityBot ועוד ב-robots.txt, Schema עשיר |
 
 UX חדש: תפריט מגה נגיש, סרגל צד מותאם לכל סוג עמוד (שירותים באותה עיר, ערים באותו אזור, שירותים קשורים, תוכן עניינים דביק),
 טופס לידים ב-hero, סרגל התקשרות קבוע במובייל, שאלות ותשובות מתקפלות, וידאו שנטען רק בלחיצה.

@@ -33,9 +33,11 @@ const faqTitle = (cols: Block[][], i: number, j: number) => {
           if (b.type === 'image') {
             const a = imgAttrs(b.src, isCardRow(cols) ? '(max-width: 640px) 50vw, 240px' : '(max-width: 768px) 100vw, 720px');
             const img = <img src={a.src} srcset={a.srcset} sizes={a.sizes} width={a.width ?? b.width} height={a.height ?? b.height} alt={b.alt} loading="lazy" decoding="async" />;
+            // a linked image without alt text gets its name from the heading beside it
+            const label = b.alt || col.find((x) => x.type === 'heading')?.text || undefined;
             return (
               <figure class="b-image">
-                {b.href ? <a href={b.href} aria-label={b.alt || undefined}>{img}</a> : img}
+                {b.href ? <a href={b.href} aria-label={label}>{img}</a> : img}
                 {b.caption && <figcaption>{b.caption}</figcaption>}
               </figure>
             );
