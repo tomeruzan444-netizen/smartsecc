@@ -28,6 +28,8 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
           publish_branch: deploy
-          force_orphan: true
+          # keep history so Hostinger's "git pull" can fast-forward on every deploy
+          force_orphan: false
+          keep_files: false
           enable_jekyll: true
           commit_message: 'deploy: ${{ github.sha }}'
