@@ -1,0 +1,56 @@
+---
+import Icon from './Icon.astro';
+import { SHARED } from '../lib/content';
+import { SITE } from '../lib/site';
+
+const cols = (SHARED.footer as { title: string; links: { text: string; href: string }[] }[]).filter((c) => c.links.length);
+const year = new Date().getFullYear();
+---
+<footer class="site-footer">
+  <div class="container grid">
+    <div class="about">
+      <p class="brand">סמארטסק</p>
+      <p>{SITE.tagline}. התקנה, תיקון ותחזוקה של מצלמות אבטחה, מערכות אזעקה ואינטרקום לבית ולעסק – בפריסה ארצית.</p>
+      <h2 class="ftitle">פרטים ליצירת קשר</h2>
+      <ul class="contact">
+        <li><Icon name="phone" /><a href={SITE.phoneHref}>טלפון – {SITE.phone}</a></li>
+        <li><Icon name="mail" /><a href={`mailto:${SITE.email}`}>אימייל – {SITE.email}</a></li>
+        <li><Icon name="clock" /><span>{SITE.openingHoursText}</span></li>
+      </ul>
+    </div>
+    {cols.map((c) => (
+      <nav aria-label={c.title.replace(':', '')}>
+        <h2 class="ftitle">{c.title}</h2>
+        <ul class="links">
+          {c.links.map((l) => <li><a href={l.href}>{l.text}</a></li>)}
+        </ul>
+      </nav>
+    ))}
+  </div>
+  <div class="bottom">
+    <div class="container bottom-in">
+      <p>© {year} סמארטסק. כל הזכויות שמורות.</p>
+      <p><a href="/מדיניות-פרטיות/">מדיניות פרטיות</a> · <a href="/הצהרת-נגישות/">הצהרת נגישות</a></p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer { background: var(--navy); color: #c9d6e3; margin-top: 64px; }
+  .grid { display: grid; grid-template-columns: 1.4fr 1fr 1.3fr 1fr; gap: 40px; padding-block: 56px 40px; }
+  .brand { font-size: 1.6rem; font-weight: 800; color: #fff; margin-bottom: .4em; }
+  .ftitle { color: #fff; font-size: 1.1rem; margin: 0 0 .9em; }
+  .about .ftitle { margin-top: 1.4em; }
+  .links, .contact { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+  .site-footer nav:nth-of-type(2) .links { grid-template-columns: 1fr 1fr; column-gap: 16px; }
+  .links a, .contact a { color: #c9d6e3; text-decoration: none; }
+  .links a:hover, .contact a:hover { color: #fff; text-decoration: underline; }
+  .contact li { display: flex; align-items: center; gap: 10px; }
+  .contact :global(svg) { width: 18px; height: 18px; color: var(--brand); flex: none; }
+  .bottom { border-top: 1px solid rgb(255 255 255 / 10%); font-size: .92rem; }
+  .bottom-in { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding-block: 18px; }
+  .bottom p { margin: 0; }
+  .bottom a { color: #c9d6e3; }
+  @media (max-width: 980px) { .grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 640px) { .grid { grid-template-columns: 1fr; gap: 28px; } .site-footer { padding-bottom: 72px; } }
+</style>

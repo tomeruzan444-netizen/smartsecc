@@ -1,0 +1,28 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { pages } from '../lib/content';
+import { SITE } from '../lib/site';
+
+const popular = pages.filter((p) => p.type === 'service' && p.topic !== 'other').slice(0, 8);
+---
+<Base title="העמוד לא נמצא | סמארטסק" robots="noindex, follow" path="/404/">
+  <section class="container nf">
+    <p class="code">404</p>
+    <h1>העמוד שחיפשתם לא נמצא</h1>
+    <p>ייתכן שהקישור שגוי או שהעמוד הועבר. אפשר לחזור לדף הבית, לבחור שירות מהרשימה או פשוט להתקשר.</p>
+    <div class="cta">
+      <a class="btn btn-brand" href="/">לדף הבית</a>
+      <a class="btn btn-cta" href={SITE.phoneHref}><Icon name="phone" />{SITE.phone}</a>
+    </div>
+    <ul class="links card">{popular.map((p) => <li><a href={p.path}>{p.label}</a></li>)}</ul>
+  </section>
+</Base>
+
+<style>
+  .nf { max-width: 760px; padding-block: 64px; text-align: center; }
+  .code { font-size: 5rem; font-weight: 800; color: var(--brand); line-height: 1; margin: 0; }
+  .cta { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin: 24px 0 32px; }
+  .links { list-style: none; margin: 0; padding: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 6px 20px; text-align: start; }
+  @media (max-width: 560px) { .links { grid-template-columns: 1fr; } }
+</style>

@@ -1,0 +1,14 @@
+---
+import Base from '../layouts/Base.astro';
+import PageView from '../components/PageView.astro';
+import { pages, type Page } from '../lib/content';
+
+export function getStaticPaths() {
+  return pages.filter((p) => p.type !== 'home').map((p) => ({ params: { slug: p.slug }, props: { page: p } }));
+}
+
+const { page } = Astro.props as { page: Page };
+---
+<Base page={page}>
+  <PageView page={page} />
+</Base>

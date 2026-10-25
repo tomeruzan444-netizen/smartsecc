@@ -1,0 +1,86 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import LeadForm from '../components/LeadForm.astro';
+import Blocks from '../components/Blocks.astro';
+import SharedSection from '../components/SharedSection.astro';
+import { pages, TOPIC_NAMES, TOPIC_HUB, type Topic } from '../lib/content';
+import { SITE } from '../lib/site';
+
+const page = pages.find((p) => p.type === 'home')!;
+const topics: Topic[] = ['cameras', 'alarms', 'intercom', 'other'];
+const services = pages.filter((p) => p.type === 'service');
+const cities = pages.filter((p) => p.type === 'city');
+---
+<Base page={page}>
+  <section class="hero">
+    <div class="container hero-in">
+      <div>
+        <p class="eyebrow"><Icon name="shield" />מצלמות אבטחה · אזעקות · אינטרקום</p>
+        <h1>{page.h1}</h1>
+        <p class="hero-sub">{page.subtitle}. התקנה, תיקון ותחזוקה לבית ולעסק – בפריסה ארצית, עם הצעת מחיר חינם.</p>
+        <div class="hero-cta">
+          <a class="btn btn-cta" href={SITE.phoneHref}><Icon name="phone" />התקשרו להצעת מחיר חינם</a>
+          <a class="btn btn-ghost" href="#services">לכל השירותים</a>
+        </div>
+        <ul class="stats">
+          <li><strong>{new Date().getFullYear() - SITE.foundingYear}+</strong><span>שנות ניסיון</span></li>
+          <li><strong>{cities.length}+</strong><span>ערים ואזורי שירות</span></li>
+          <li><strong>{services.length}</strong><span>סוגי שירותים</span></li>
+        </ul>
+      </div>
+      <LeadForm />
+    </div>
+  </section>
+
+  <div class="container">
+    <section class="content card">
+      <Blocks blocks={page.blocks} />
+    </section>
+
+    <section id="services" class="services" aria-labelledby="services-title">
+      <h2 id="services-title">כל השירותים שלנו</h2>
+      <div class="svc-grid">
+        {topics.map((t) => {
+          const list = services.filter((s) => s.topic === t);
+          if (!list.length) return null;
+          return (
+            <nav class="svc card" aria-label={TOPIC_NAMES[t]}>
+              <h3>{t !== 'other' ? <a href={TOPIC_HUB[t]}>{TOPIC_NAMES[t]}</a> : TOPIC_NAMES[t]}</h3>
+              <ul>{list.map((s) => <li><a href={s.path}>{s.label}</a></li>)}</ul>
+            </nav>
+          );
+        })}
+      </div>
+    </section>
+  </div>
+
+  <SharedSection />
+</Base>
+
+<style>
+  .hero { color: #fff; background: radial-gradient(1000px 500px at 90% -20%, rgb(0 187 218 / 50%), transparent 60%), linear-gradient(135deg, var(--navy), var(--navy-2) 55%, #0d4a6b); padding-block: 48px 64px; }
+  .hero-in { display: grid; grid-template-columns: 1.2fr 1fr; gap: 48px; align-items: center; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 99px; background: rgb(255 255 255 / 10%); font-weight: 650; margin-bottom: 18px; }
+  .eyebrow :global(svg) { width: 18px; height: 18px; color: var(--brand); }
+  .hero h1 { color: #fff; font-size: clamp(2rem, 1.3rem + 2.8vw, 3.2rem); }
+  .hero-sub { font-size: 1.25rem; color: #d7e6f2; max-width: 40ch; }
+  .hero-cta { display: flex; flex-wrap: wrap; gap: 10px; margin: 26px 0 30px; }
+  .stats { list-style: none; margin: 0; padding: 0; display: flex; gap: 32px; flex-wrap: wrap; }
+  .stats li { display: grid; }
+  .stats strong { font-size: 1.9rem; line-height: 1.1; color: #fff; }
+  .stats span { color: #b9cde0; font-size: .95rem; }
+  .hero :global(.lead) { color: var(--text); }
+  .content { margin-top: -28px; position: relative; padding: clamp(20px, 3vw, 40px); }
+  .services { margin-top: 48px; }
+  .svc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 18px; }
+  .svc { padding: 22px; }
+  .svc h3 { font-size: 1.2rem; }
+  .svc h3 a { color: var(--navy); text-decoration: none; }
+  .svc h3 a:hover { color: var(--brand-ink); }
+  .svc ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+  .svc li a { display: block; padding: 6px 0; color: var(--text); text-decoration: none; }
+  .svc li a:hover { color: var(--brand-ink); text-decoration: underline; }
+  @media (max-width: 1024px) { .hero-in { grid-template-columns: 1fr; gap: 28px; } }
+  @media (max-width: 640px) { .hero { padding-block: 28px 48px; } .hero-cta .btn { width: 100%; } .stats { gap: 20px; } }
+</style>

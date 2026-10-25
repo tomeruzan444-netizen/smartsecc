@@ -1,0 +1,23 @@
+{
+  "name": "smartsecc",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "description": "סמארטסק – אתר סטטי מהיר (Astro) שהועבר מוורדפרס תוך שמירה על כתובות ה-URL וה-SEO",
+  "scripts": {
+    "images": "node scripts/optimize-images.mjs",
+    "dev": "npm run images && astro dev",
+    "build": "npm run images && astro build && node scripts/verify-build.mjs",
+    "preview": "astro preview"
+  },
+  "engines": {
+    "node": ">=20.3.0"
+  },
+  "dependencies": {
+    "@fontsource-variable/assistant": "5.3.0",
+    "astro": "5.18.2"
+  },
+  "devDependencies": {
+    "sharp": "0.34.5"
+  }
+}

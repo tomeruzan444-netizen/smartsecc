@@ -1,0 +1,115 @@
+---
+// The block WordPress appended to every page (Elementor section 1458): testimonials,
+// service areas, services, promo video and the daily security tip.
+import Icon from './Icon.astro';
+import { SHARED } from '../lib/content';
+import { imgAttrs } from '../lib/images';
+
+const [areas, services] = SHARED.sectionLists as { text: string; href: string }[][];
+const testimonials = SHARED.testimonials as { text: string; name: string; img: string | null }[];
+const videoId = /v=([\w-]{11})/.exec(SHARED.video ?? '')?.[1];
+const tips: string[] = SHARED.tips;
+---
+<section class="shared" aria-label="מידע נוסף על סמארטסק">
+  <div class="container">
+    <div class="block">
+      <h2 class="title"><Icon name="star" />מה לקוחות חושבים עלינו?</h2>
+      <div class="testimonials">
+        {testimonials.map((t) => {
+          const a = t.img ? imgAttrs(t.img, '56px') : null;
+          return (
+            <figure class="t card">
+              <div class="stars" aria-hidden="true">★★★★★</div>
+              <blockquote>{t.text}</blockquote>
+              <figcaption>
+                {a ? <img src={a.src} srcset={a.srcset} sizes="56px" width="56" height="56" alt="" loading="lazy" decoding="async" /> : <span class="avatar" aria-hidden="true">{t.name.charAt(0)}</span>}
+                <cite>{t.name}</cite>
+              </figcaption>
+            </figure>
+          );
+        })}
+      </div>
+    </div>
+
+    <div class="block split">
+      <nav class="card list" aria-label="אזורי שירות">
+        <h2 class="title"><Icon name="pin" />אזורי שירות</h2>
+        <ul>{areas.map((l) => <li><a href={l.href}>{l.text}</a></li>)}</ul>
+        <a class="more" href="/אזורי-שירות/">לכל אזורי השירות ←</a>
+      </nav>
+      <nav class="card list" aria-label="בין השירותים שלנו">
+        <h2 class="title"><Icon name="shield" />בין השירותים שלנו</h2>
+        <ul class="two">{services.map((l) => <li><a href={l.href}>{l.text}</a></li>)}</ul>
+      </nav>
+    </div>
+
+    <div class="block split">
+      {videoId && (
+        <div class="card video-card">
+          <h2 class="title"><Icon name="play" />סרטון תדמית</h2>
+          <button class="yt" type="button" data-yt={videoId} aria-label="הפעלת סרטון התדמית של סמארטסק">
+            <img src={`https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`} alt="" width="480" height="360" loading="lazy" decoding="async" />
+            <span class="play"><Icon name="play" /></span>
+          </button>
+        </div>
+      )}
+      <div class="card tip" id="dailyTip">
+        <h2 class="title"><Icon name="bulb" />טיפ יומי לאבטחה</h2>
+        <p class="tip-text" data-tip>{tips[0]}</p>
+        <p class="tip-date" data-tip-date></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script define:vars={{ tips }}>
+  const now = new Date();
+  const day = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 864e5);
+  const el = document.querySelector('[data-tip]');
+  if (el && tips.length) el.textContent = tips[day % tips.length];
+  const d = document.querySelector('[data-tip-date]');
+  if (d) d.textContent = now.toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  document.querySelectorAll('[data-yt]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const f = document.createElement('iframe');
+      f.src = `https://www.youtube-nocookie.com/embed/${btn.dataset.yt}?autoplay=1&rel=0`;
+      f.title = 'סרטון תדמית סמארטסק';
+      f.allow = 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture';
+      f.allowFullscreen = true;
+      btn.replaceWith(f);
+    }, { once: true });
+  });
+</script>
+
+<style>
+  .shared { padding-block: 56px 8px; background: linear-gradient(180deg, var(--bg), #eaf3f8); border-top: 1px solid var(--line); }
+  .block { margin-bottom: 32px; }
+  .title { display: flex; align-items: center; gap: 10px; font-size: 1.45rem; }
+  .title :global(svg) { width: 26px; height: 26px; color: var(--brand-ink); flex: none; }
+  .testimonials { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; }
+  .t { margin: 0; padding: 22px; display: flex; flex-direction: column; gap: 10px; }
+  .stars { color: #f5a623; letter-spacing: 2px; }
+  .t blockquote { margin: 0; flex: 1; font-size: 1.05rem; }
+  .t figcaption { display: flex; align-items: center; gap: 12px; }
+  .t img, .avatar { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; }
+  .avatar { display: grid; place-items: center; background: var(--brand-soft); color: var(--brand-ink); font-weight: 800; }
+  .t cite { font-style: normal; font-weight: 750; color: var(--navy); }
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .list { padding: 22px; }
+  .list ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+  .list ul.two { grid-template-columns: 1fr 1fr; column-gap: 16px; }
+  .list a { display: block; padding: 6px 0; color: var(--text); text-decoration: none; }
+  .list a:hover { color: var(--brand-ink); text-decoration: underline; }
+  .more { display: inline-block; margin-top: 10px; font-weight: 700; }
+  .video-card, .tip { padding: 22px; }
+  .yt { position: relative; display: block; width: 100%; padding: 0; border: 0; border-radius: var(--radius-sm); overflow: hidden; cursor: pointer; aspect-ratio: 16 / 9; background: #000; }
+  .yt img { width: 100%; height: 100%; object-fit: cover; opacity: .9; }
+  .play { position: absolute; inset: 0; margin: auto; width: 72px; height: 72px; border-radius: 50%; background: rgb(255 0 0 / 90%); color: #fff; display: grid; place-items: center; }
+  .play :global(svg) { width: 36px; height: 36px; }
+  .video-card :global(iframe) { width: 100%; aspect-ratio: 16 / 9; border: 0; border-radius: var(--radius-sm); }
+  .tip { background: linear-gradient(135deg, #fff8e1, #fff); }
+  .tip-text { font-size: 1.15rem; font-weight: 600; color: var(--navy); }
+  .tip-date { color: var(--muted); font-size: .9rem; margin: 0; }
+  @media (max-width: 760px) { .split { grid-template-columns: 1fr; } }
+  @media (max-width: 420px) { .list ul.two { grid-template-columns: 1fr; } }
+</style>

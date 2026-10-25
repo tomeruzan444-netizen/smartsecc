@@ -1,0 +1,151 @@
+---
+import Faq from './Faq.astro';
+import Icon from './Icon.astro';
+import { sections, type Block } from '../lib/content';
+import { enhanceHtml, imgAttrs } from '../lib/images';
+
+interface Props { blocks: Block[] }
+const { blocks } = Astro.props;
+const rows = sections(blocks.filter((b) => b.type !== 'toc'));
+
+// An Elementor row with several columns that each hold an image + heading is a card grid
+const isCardRow = (cols: Block[][]) =>
+  cols.length >= 2 &&
+  cols.every((c) => c.length <= 3 && c.some((b) => b.type === 'image' || b.type === 'imageBox') && c.every((b) => ['image', 'imageBox', 'heading'].includes(b.type)));
+
+// a heading directly followed by an FAQ becomes the FAQ section title
+const faqTitle = (cols: Block[][], i: number, j: number) => {
+  const prev = cols[i][j - 1];
+  return prev?.type === 'heading' ? prev.text : null;
+};
+---
+{rows.map(({ cols }) => (
+  <div class:list={['row', { 'row-cards': isCardRow(cols) }]}>
+    {cols.map((col, i) => (
+      <div class="col">
+        {col.map((b, j) => {
+          if (b.type === 'heading' && col[j + 1]?.type === 'faq') return null;
+          if (b.type === 'heading') {
+            const Tag = b.level as 'h2' | 'h3' | 'h4' | 'p';
+            return <Tag id={b.id} class="b-heading">{b.href ? <a href={b.href}>{b.text}</a> : b.text}</Tag>;
+          }
+          if (b.type === 'rich') return <div class="prose" set:html={enhanceHtml(b.html)} />;
+          if (b.type === 'image') {
+            const a = imgAttrs(b.src, isCardRow(cols) ? '(max-width: 640px) 50vw, 240px' : '(max-width: 768px) 100vw, 720px');
+            const img = <img src={a.src} srcset={a.srcset} sizes={a.sizes} width={a.width ?? b.width} height={a.height ?? b.height} alt={b.alt} loading="lazy" decoding="async" />;
+            return (
+              <figure class="b-image">
+                {b.href ? <a href={b.href} aria-label={b.alt || undefined}>{img}</a> : img}
+                {b.caption && <figcaption>{b.caption}</figcaption>}
+              </figure>
+            );
+          }
+          if (b.type === 'imageBox') {
+            const a = imgAttrs(b.src, '(max-width: 640px) 100vw, 380px');
+            return (
+              <figure class="b-imagebox card">
+                {b.src && <img src={a.src} srcset={a.srcset} sizes={a.sizes} width={a.width} height={a.height} alt={b.alt} loading="lazy" decoding="async" />}
+                {(b.title || b.text) && (
+                  <figcaption>
+                    {b.title && <h3>{b.title}</h3>}
+                    {b.text && <p>{b.text}</p>}
+                  </figcaption>
+                )}
+              </figure>
+            );
+          }
+          if (b.type === 'faq') return <Faq items={b.items} id={b.id} title={faqTitle(cols, i, j) ?? 'שאלות ותשובות'} />;
+          if (b.type === 'priceRange') {
+            const pct = Math.round(((b.avg - b.low) / Math.max(1, b.high - b.low)) * 100);
+            return (
+              <div class="price card" role="group" aria-label={b.title}>
+                <p class="price-title">{b.title}</p>
+                <p class="price-label">{b.label}</p>
+                <p class="price-avg">{b.avg} ₪</p>
+                <div class="price-bar" aria-hidden="true"><span style={`inset-inline-start: ${pct}%`} /></div>
+                <div class="price-ends">
+                  <span>טווח נמוך <strong>{b.low} ₪</strong></span>
+                  <span>טווח גבוה <strong>{b.high} ₪</strong></span>
+                </div>
+              </div>
+            );
+          }
+          if (b.type === 'callout') {
+            return (
+              <aside class="callout" role="note">
+                <p class="callout-title"><Icon name="warn" />{b.title}</p>
+                {b.items.map((t: string) => <p>{t}</p>)}
+              </aside>
+            );
+          }
+          if (b.type === 'linkGroups') {
+            return (
+              <div class="link-groups">
+                {b.groups.map((g: any) => (
+                  <section class="card lg">
+                    {g.title && <h2>{g.title}</h2>}
+                    <ul>{g.links.map((l: any) => <li><a href={l.href}><Icon name="pin" />{l.text}</a></li>)}</ul>
+                  </section>
+                ))}
+              </div>
+            );
+          }
+          if (b.type === 'html') {
+            return (
+              <section class="b-html">
+                {b.title && <h2>{b.title}</h2>}
+                {b.subtitle && <p class="sub">{b.subtitle}</p>}
+                <div class="prose" set:html={enhanceHtml(b.html)} />
+              </section>
+            );
+          }
+          return null;
+        })}
+      </div>
+    ))}
+  </div>
+))}
+
+<style>
+  .row { margin-bottom: 8px; }
+  .row-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 16px; margin-block: 8px 28px; }
+  .row-cards .col { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 18px 14px; text-align: center; transition: transform .15s, box-shadow .15s; }
+  .row-cards .col:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+  .row-cards .b-image img { width: 120px; margin: 0 auto 10px; }
+  .row-cards .b-heading { font-size: 1.1rem; margin: 0; }
+  .row-cards .b-heading a { color: var(--navy); text-decoration: none; }
+  .row-cards .b-heading a::after { content: ''; position: absolute; inset: 0; }
+  .row-cards .col { position: relative; }
+  .b-heading a { color: inherit; }
+  h2.b-heading { margin-top: 1.4em; }
+  .row:first-child h2.b-heading:first-child { margin-top: 0; }
+  .b-image { margin: 16px 0 24px; }
+  .b-image img { border-radius: var(--radius-sm); margin-inline: auto; }
+  .b-image figcaption { text-align: center; color: var(--muted); font-size: .9rem; margin-top: 6px; }
+  .b-imagebox { margin: 0; overflow: hidden; height: 100%; }
+  .b-imagebox img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+  .b-imagebox figcaption { padding: 14px 16px; }
+  .b-imagebox h3 { margin: 0 0 4px; font-size: 1.1rem; }
+  .b-imagebox p { margin: 0; color: var(--muted); }
+  .price { max-width: 520px; margin: 12px auto 28px; padding: 22px 24px; text-align: center; }
+  .price-title { font-weight: 800; color: var(--navy); font-size: 1.2rem; margin: 0; }
+  .price-label { color: var(--muted); margin: 2px 0 6px; }
+  .price-avg { font-size: 2.4rem; font-weight: 800; color: var(--brand-ink); margin: 0 0 12px; line-height: 1.1; }
+  .price-bar { position: relative; height: 10px; border-radius: 99px; background: linear-gradient(90deg, #61ce70, var(--brand), #0b4a7a); }
+  [dir='rtl'] .price-bar { background: linear-gradient(-90deg, #61ce70, var(--brand), #0b4a7a); }
+  .price-bar span { position: absolute; top: 50%; width: 22px; height: 22px; border-radius: 50%; background: #fff; border: 4px solid var(--navy); transform: translate(50%, -50%); }
+  .price-ends { display: flex; justify-content: space-between; margin-top: 10px; font-size: .95rem; color: var(--muted); }
+  .price-ends strong { color: var(--navy); }
+  .callout { margin: 16px 0 28px; padding: 18px 20px; background: var(--warn-bg); border: 1px solid #f7d79a; border-inline-start: 5px solid var(--warn-line); border-radius: var(--radius-sm); }
+  .callout-title { display: flex; gap: 8px; align-items: center; font-weight: 800; color: #7a4a00; margin-bottom: .4em; }
+  .callout-title :global(svg) { width: 22px; height: 22px; color: var(--warn-line); flex: none; }
+  .callout p:last-child { margin-bottom: 0; }
+  .link-groups { display: grid; gap: 20px; }
+  .lg { padding: 22px; }
+  .lg h2 { font-size: 1.3rem; }
+  .lg ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 6px 16px; }
+  .lg a { display: flex; gap: 8px; align-items: center; padding: 6px 0; text-decoration: none; color: var(--text); }
+  .lg a:hover { color: var(--brand-ink); }
+  .lg :global(svg) { width: 16px; height: 16px; color: var(--brand-ink); flex: none; }
+  .b-html .sub { color: var(--muted); }
+</style>

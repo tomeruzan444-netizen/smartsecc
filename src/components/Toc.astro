@@ -1,0 +1,52 @@
+---
+import Icon from './Icon.astro';
+
+interface Props { items: { id: string; text: string; level: number }[]; variant?: 'inline' | 'side' }
+const { items, variant = 'inline' } = Astro.props;
+---
+{items.length > 1 && (
+  variant === 'inline' ? (
+    <details class="toc toc-inline card">
+      <summary><Icon name="list" />ניווט בתוכן <span class="count">{items.length} נושאים</span></summary>
+      <ol>{items.map((t) => <li class={`l${t.level}`}><a href={`#${t.id}`}>{t.text}</a></li>)}</ol>
+    </details>
+  ) : (
+    <nav class="toc toc-side card" aria-label="ניווט בתוכן">
+      <p class="toc-title"><Icon name="list" />ניווט בתוכן</p>
+      <ol>{items.map((t) => <li class={`l${t.level}`}><a href={`#${t.id}`} data-toc>{t.text}</a></li>)}</ol>
+    </nav>
+  )
+)}
+
+<script>
+  // highlight the section currently in view
+  const links = [...document.querySelectorAll<HTMLAnchorElement>('a[data-toc]')];
+  if (links.length && 'IntersectionObserver' in window) {
+    const map = new Map(links.map((a) => [decodeURIComponent(a.hash.slice(1)), a]));
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (!e.isIntersecting) continue;
+        links.forEach((l) => l.classList.remove('active'));
+        map.get(e.target.id)?.classList.add('active');
+      }
+    }, { rootMargin: '-20% 0px -70% 0px' });
+    map.forEach((_a, id) => { const el = document.getElementById(id); if (el) io.observe(el); });
+  }
+</script>
+
+<style>
+  .toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+  .toc a { display: block; padding: 6px 10px; border-radius: 8px; color: var(--text); text-decoration: none; font-size: .95rem; line-height: 1.4; border-inline-start: 3px solid transparent; }
+  .toc a:hover { background: var(--brand-soft); color: var(--brand-ink); }
+  .toc a.active { border-color: var(--brand); background: var(--brand-soft); color: var(--navy); font-weight: 700; }
+  .toc .l3 a { padding-inline-start: 22px; font-size: .9rem; color: var(--muted); }
+  .toc :global(svg) { width: 20px; height: 20px; color: var(--brand-ink); flex: none; }
+  .toc-inline { margin: 0 0 28px; padding: 4px 16px; display: none; }
+  .toc-inline summary { cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 750; color: var(--navy); padding: 12px 0; list-style: none; }
+  .toc-inline summary::-webkit-details-marker { display: none; }
+  .toc-inline .count { margin-inline-start: auto; font-weight: 500; color: var(--muted); font-size: .9rem; }
+  .toc-inline ol { padding-bottom: 12px; }
+  .toc-side { padding: 16px; max-height: calc(100vh - var(--header-h) - 48px); overflow-y: auto; }
+  .toc-title { display: flex; align-items: center; gap: 8px; font-weight: 750; color: var(--navy); margin: 0 0 8px; }
+  @media (max-width: 1024px) { .toc-inline { display: block; } }
+</style>

@@ -1,0 +1,36 @@
+---
+// Same notice the WordPress site showed; the choice is remembered in localStorage.
+---
+<div class="cookie card" role="dialog" aria-live="polite" aria-label="הודעת עוגיות" hidden data-cookie>
+  <p>אנו משתמשים בעוגיות (Cookies) ובטכנולוגיות דומות לשיפור חוויית הגלישה, ניתוח תנועה באתר והצגת תכנים מותאמים. לפרטים נוספים: <a href="/מדיניות-פרטיות/">מדיניות פרטיות</a></p>
+  <div class="actions">
+    <button class="btn btn-brand" type="button" data-choice="accepted">אישור</button>
+    <button class="btn reject" type="button" data-choice="rejected">דחייה</button>
+  </div>
+</div>
+
+<script>
+  const KEY = 'smartsec-cookie-consent';
+  const box = document.querySelector<HTMLElement>('[data-cookie]');
+  let saved: string | null = null;
+  try { saved = localStorage.getItem(KEY); } catch {}
+  if (box && !saved) {
+    setTimeout(() => { box.hidden = false; }, 1500);
+    box.querySelectorAll<HTMLButtonElement>('[data-choice]').forEach((b) =>
+      b.addEventListener('click', () => {
+        try { localStorage.setItem(KEY, b.dataset.choice!); } catch {}
+        box.hidden = true;
+      }),
+    );
+  }
+</script>
+
+<style>
+  .cookie { position: fixed; z-index: 60; inset-inline-start: 16px; bottom: 16px; max-width: 420px; padding: 18px; font-size: .95rem; }
+  .cookie p { margin: 0 0 12px; }
+  .actions { display: flex; gap: 8px; }
+  .actions .btn { min-height: 42px; flex: 1; }
+  .reject { background: #eef2f6; color: var(--navy); }
+  .reject:hover { background: #e2e8ef; }
+  @media (max-width: 640px) { .cookie { inset-inline: 12px; bottom: 82px; max-width: none; } }
+</style>

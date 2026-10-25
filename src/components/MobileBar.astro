@@ -1,0 +1,16 @@
+---
+import Icon from './Icon.astro';
+import { SITE } from '../lib/site';
+---
+<div class="mobile-bar" role="region" aria-label="יצירת קשר מהירה">
+  <a class="btn btn-cta" href={SITE.phoneHref}><Icon name="phone" />התקשרו עכשיו</a>
+  <a class="btn btn-brand" href="#lead-form"><Icon name="send" />הצעת מחיר</a>
+</div>
+
+<style>
+  .mobile-bar { display: none; }
+  @media (max-width: 640px) {
+    .mobile-bar { position: fixed; inset-inline: 0; bottom: 0; z-index: 40; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 10px 12px calc(10px + env(safe-area-inset-bottom)); background: rgb(255 255 255 / 97%); border-top: 1px solid var(--line); box-shadow: 0 -6px 20px rgb(11 37 64 / 10%); }
+    .mobile-bar .btn { min-height: 46px; font-size: 1rem; padding: 0 .8em; }
+  }
+</style>

@@ -1,0 +1,65 @@
+---
+import Icon from './Icon.astro';
+import Toc from './Toc.astro';
+import { sidebarFor, type Page } from '../lib/content';
+import { SITE } from '../lib/site';
+
+interface Props { page: Page }
+const { page } = Astro.props;
+const { groups } = sidebarFor(page);
+---
+<aside class="sidebar" aria-label="מידע נוסף">
+  <div class="sticky">
+    <Toc items={page.toc} variant="side" />
+
+    <div class="call card">
+      <p class="call-title">צריכים ייעוץ מהיר?</p>
+      <p class="call-text">מומחה אבטחה זמין לשיחה – הצעת מחיר חינם.</p>
+      <a class="btn btn-cta" href={SITE.phoneHref}><Icon name="phone" />{SITE.phone}</a>
+      <a class="btn btn-brand" href="#lead-form"><Icon name="send" />השאירו פרטים</a>
+    </div>
+  </div>
+
+  {groups.map((g) => (
+    <nav class="links card" aria-label={g.title}>
+      <p class="links-title">{g.title}</p>
+      <ul>
+        {g.links.map((l) => <li><a href={l.href}>{l.text}</a></li>)}
+      </ul>
+      {g.more && <a class="more" href={g.more.href}>{g.more.text} ←</a>}
+    </nav>
+  ))}
+
+  <div class="trust card">
+    <ul>
+      <li><Icon name="shield" />מומחים מאז {SITE.foundingYear}</li>
+      <li><Icon name="check" />מתקינים מוסמכים ואחריות על העבודה</li>
+      <li><Icon name="pin" />פריסה ארצית</li>
+      <li><Icon name="clock" />{SITE.openingHoursText}</li>
+    </ul>
+  </div>
+</aside>
+
+<style>
+  .sidebar { display: grid; gap: 18px; align-content: start; }
+  .sticky { position: sticky; top: calc(var(--header-h) + 16px); display: grid; gap: 18px; }
+  .call { padding: 20px; display: grid; gap: 10px; background: linear-gradient(160deg, var(--navy), var(--navy-2)); border: 0; color: #fff; }
+  .call-title { font-size: 1.2rem; font-weight: 800; margin: 0; }
+  .call-text { margin: 0 0 4px; color: #c9d6e3; }
+  .links { padding: 18px; }
+  .links-title { font-weight: 800; color: var(--navy); margin: 0 0 8px; }
+  .links ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; max-height: 340px; overflow-y: auto; }
+  .links a { display: block; padding: 7px 10px; border-radius: 8px; color: var(--text); text-decoration: none; font-size: .95rem; line-height: 1.4; }
+  .links a:hover { background: var(--brand-soft); color: var(--brand-ink); }
+  .more { display: inline-block; margin-top: 8px; font-weight: 700; }
+  .trust { padding: 18px; }
+  .trust ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+  .trust li { display: flex; gap: 10px; align-items: center; font-weight: 600; color: var(--navy); }
+  .trust :global(svg) { width: 20px; height: 20px; color: var(--brand-ink); flex: none; }
+  /* the sticky TOC/call box only makes sense next to the article on wide screens */
+  @media (max-width: 1024px) {
+    .sticky { position: static; }
+    .sticky :global(.toc-side) { display: none; }
+    .sidebar { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+  }
+</style>
