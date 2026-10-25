@@ -2,30 +2,44 @@
 import Icon from './Icon.astro';
 import { SITE } from '../lib/site';
 
-interface Props { title?: string; id?: string; city?: string | null; compact?: boolean }
-const { title = 'השאירו פרטים ונחזור אליכם', id = 'lead-form', city, compact = false } = Astro.props;
+interface Props {
+  variant?: 'card' | 'bar' | 'footer';
+  title?: string;
+  id?: string;
+  city?: string | null;
+}
+const { variant = 'card', city } = Astro.props;
+const id = Astro.props.id ?? (variant === 'bar' ? 'lead-form' : variant === 'footer' ? 'footer-form' : 'card-form');
+const title = Astro.props.title ?? (variant === 'bar' ? 'לפרטים והזמנות' : variant === 'footer' ? 'השאירו פרטים להצעה משתלמת' : 'השאירו פרטים ונחזור אליכם');
+const withMessage = variant === 'card';
 const uid = id.replace(/[^a-z0-9-]/gi, '');
 ---
-<form class:list={['lead card', { compact }]} id={id} action={SITE.formEndpoint} method="post" data-lead novalidate>
-  <h2 class="lead-title">{title}</h2>
-  <p class="lead-sub">הצעת מחיר חינם וללא התחייבות · חוזרים אליכם במהירות</p>
+<form class:list={['lead', `lead-${variant}`]} id={id} action={SITE.formEndpoint} method="post" data-lead novalidate>
+  <div class="lead-head">
+    {variant === 'bar' && <span class="lead-ico" aria-hidden="true"><Icon name="shield" /></span>}
+    <h2 class="lead-title">{title}</h2>
+    {variant === 'card' && <p class="lead-sub">הצעת מחיר חינם וללא התחייבות</p>}
+  </div>
   <div class="fields">
     <div class="field">
-      <label for={`${uid}-name`}>שם</label>
-      <input class="input" id={`${uid}-name`} name="name" autocomplete="name" required maxlength="80" />
+      <label for={`${uid}-name`} class:list={{ 'visually-hidden': variant !== 'card' }}>שם מלא</label>
+      <input class="input" id={`${uid}-name`} name="name" autocomplete="name" required maxlength="80" placeholder={variant !== 'card' ? 'שם מלא' : undefined} />
     </div>
     <div class="field">
-      <label for={`${uid}-phone`}>מספר טלפון</label>
-      <input class="input" id={`${uid}-phone`} name="phone" type="tel" inputmode="tel" autocomplete="tel" required pattern="[0-9+\-\s]{9,15}" dir="ltr" />
+      <label for={`${uid}-phone`} class:list={{ 'visually-hidden': variant !== 'card' }}>טלפון</label>
+      <input class="input" id={`${uid}-phone`} name="phone" type="tel" inputmode="tel" autocomplete="tel" required pattern="[0-9+\-\s]{9,15}" placeholder={variant !== 'card' ? 'טלפון' : undefined} />
     </div>
     <div class="field">
-      <label for={`${uid}-city`}>עיר</label>
-      <input class="input" id={`${uid}-city`} name="city" autocomplete="address-level2" required maxlength="60" value={city ?? undefined} />
+      <label for={`${uid}-city`} class:list={{ 'visually-hidden': variant !== 'card' }}>אזור מגורים</label>
+      <input class="input" id={`${uid}-city`} name="city" autocomplete="address-level2" required maxlength="60" value={city ?? undefined} placeholder={variant !== 'card' ? 'אזור מגורים' : undefined} />
     </div>
-    <div class="field wide">
-      <label for={`${uid}-msg`}>איך נוכל לעזור?</label>
-      <textarea class="input" id={`${uid}-msg`} name="message" required maxlength="1500" rows="3"></textarea>
-    </div>
+    {withMessage && (
+      <div class="field wide">
+        <label for={`${uid}-msg`}>איך נוכל לעזור?</label>
+        <textarea class="input" id={`${uid}-msg`} name="message" maxlength="1500" rows="3"></textarea>
+      </div>
+    )}
+    <button class="btn btn-cta submit" type="submit">תנו לי הצעה!</button>
   </div>
   <div class="hp" aria-hidden="true">
     <label>אתר <input name="website" tabindex="-1" autocomplete="off" /></label>
@@ -36,12 +50,12 @@ const uid = id.replace(/[^a-z0-9-]/gi, '');
     <input type="checkbox" name="consent" value="1" required />
     <span>אני מאשר/ת כי ידוע לי שהפרטים שמסרתי יעובדו בהתאם לחוק הגנת הפרטיות. לפרטים נוספים: <a href="/מדיניות-פרטיות/">מדיניות פרטיות</a></span>
   </label>
-  <button class="btn btn-cta submit" type="submit"><Icon name="send" />שלחו ונחזור אליכם</button>
   <p class="status" role="status" aria-live="polite"></p>
-  <p class="or">או התקשרו עכשיו: <a href={SITE.phoneHref}>{SITE.phone}</a></p>
 </form>
 
 <script>
+  const OK = 'תודה! הפרטים התקבלו ונחזור אליכם בהקדם.';
+  const FAIL = 'לא הצלחנו לשלוח כרגע. אפשר להתקשר אלינו ישירות: 03-3769229';
   document.querySelectorAll<HTMLFormElement>('form[data-lead]').forEach((form) => {
     const ts = form.querySelector<HTMLInputElement>('[data-ts]');
     if (ts) ts.value = String(Date.now());
@@ -50,14 +64,14 @@ const uid = id.replace(/[^a-z0-9-]/gi, '');
     // result of a no-JS submission redirected back by contact.php
     const sent = new URLSearchParams(location.search).get('sent');
     if (sent && form.id === 'lead-form') {
-      status.textContent = sent === '1' ? 'תודה! הפרטים התקבלו ונחזור אליכם בהקדם.' : 'לא הצלחנו לשלוח כרגע. אפשר להתקשר אלינו ישירות: 03-3769229';
+      status.textContent = sent === '1' ? OK : FAIL;
       status.dataset.state = sent === '1' ? 'ok' : 'error';
     }
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       if (!form.checkValidity()) {
         form.classList.add('touched');
-        status.textContent = 'נא למלא את כל השדות ולאשר את מדיניות הפרטיות.';
+        status.textContent = 'נא למלא שם, טלפון ואזור ולאשר את מדיניות הפרטיות.';
         status.dataset.state = 'error';
         form.querySelector<HTMLElement>(':invalid')?.focus();
         return;
@@ -70,10 +84,10 @@ const uid = id.replace(/[^a-z0-9-]/gi, '');
         const data = await res.json().catch(() => ({}));
         if (!res.ok || !data.ok) throw new Error(data.error || 'send failed');
         form.reset();
-        status.textContent = 'תודה! הפרטים התקבלו ונחזור אליכם בהקדם.';
+        status.textContent = OK;
         status.dataset.state = 'ok';
       } catch {
-        status.textContent = 'לא הצלחנו לשלוח כרגע. אפשר להתקשר אלינו ישירות: 03-3769229';
+        status.textContent = FAIL;
         status.dataset.state = 'error';
       } finally {
         btn.disabled = false;
@@ -83,23 +97,60 @@ const uid = id.replace(/[^a-z0-9-]/gi, '');
 </script>
 
 <style>
-  .lead { padding: 24px; display: grid; gap: 12px; scroll-margin-top: calc(var(--header-h) + 16px); }
-  .lead-title { font-size: 1.4rem; margin: 0; }
-  .lead-sub { margin: -6px 0 4px; color: var(--muted); font-size: .95rem; }
-  .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .fields .wide { grid-column: 1 / -1; }
-  .compact .fields { grid-template-columns: 1fr; }
+  .lead { display: grid; gap: 10px; scroll-margin-top: calc(var(--header-h) + 16px); }
+  .lead-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .lead-title { margin: 0; font-size: 1.35rem; }
+  .lead-sub { margin: 0; color: var(--muted); font-size: .95rem; width: 100%; }
+  .fields { display: grid; gap: 10px; }
+  .input::placeholder { color: #6b7480; }
   .touched .input:invalid { border-color: #c2410c; }
   .hp { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
-  .consent { display: flex; gap: 10px; align-items: flex-start; font-size: .85rem; color: var(--muted); line-height: 1.5; }
-  .consent input { width: 20px; height: 20px; margin-top: 2px; accent-color: var(--brand-ink); flex: none; }
-  .submit { width: 100%; }
+  .consent { display: flex; gap: 8px; align-items: flex-start; font-size: .82rem; line-height: 1.45; }
+  .consent input { width: 18px; height: 18px; margin-top: 1px; accent-color: var(--cta); flex: none; }
+  .submit { border-radius: 4px; min-height: 46px; }
   .submit:disabled { opacity: .7; cursor: progress; }
-  .status { margin: 0; font-weight: 650; min-height: 0; }
+  .status { margin: 0; font-weight: 700; }
   .status:empty { display: none; }
   .status[data-state='ok'] { color: var(--cta); }
   .status[data-state='error'] { color: #b42318; }
-  .or { margin: 0; text-align: center; font-size: .95rem; color: var(--muted); }
-  .or a { font-weight: 750; }
-  @media (max-width: 480px) { .fields { grid-template-columns: 1fr; } .lead { padding: 18px; } }
+
+  /* card: sidebar / contact page */
+  .lead-card { background: #fff; border: 1px solid var(--line); border-top: 4px solid var(--brand); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px; }
+  .lead-card .lead-title { color: var(--blue-dark); }
+  .lead-card .consent { color: var(--muted); }
+
+  /* bar: hero strip – icon + title | name | phone | area | button */
+  .lead-bar { grid-template-columns: auto 1fr; column-gap: 24px; row-gap: 6px; align-items: center; color: #fff; }
+  .lead-bar .lead-head { grid-row: span 2; }
+  .lead-bar .lead-ico { width: 52px; height: 52px; border-radius: 50%; background: #fff; color: var(--blue); display: grid; place-items: center; box-shadow: 0 0 0 3px var(--brand); }
+  .lead-bar .lead-ico :global(svg) { width: 30px; height: 30px; }
+  .lead-bar .lead-title { color: #fff; font-size: 1.5rem; line-height: 1.1; max-width: 6.5em; }
+  .lead-bar .fields { grid-template-columns: repeat(3, minmax(0, 1fr)) auto; }
+  .lead-bar .input { border-radius: 3px; border-color: #fff; min-height: 44px; }
+  .lead-bar .submit { padding: 0 1.8em; }
+  .lead-bar .consent { color: #eef2f5; }
+  .lead-bar .consent a { color: #fff; }
+  .lead-bar .status { grid-column: 2; }
+  .lead-bar .status[data-state='ok'] { color: #b9f5c3; }
+  .lead-bar .status[data-state='error'] { color: #ffd0cc; }
+
+  /* footer: stacked on gray panel */
+  .lead-footer { background: rgb(84 89 95 / 85%); padding: 14px; border-radius: 4px; }
+  .lead-footer .lead-head { order: -1; }
+  .lead-footer .lead-title { color: #fff; font-size: 1.2rem; text-align: center; width: 100%; display: block; }
+  .lead-footer .consent { color: #dfe4e8; }
+  .lead-footer .consent a { color: #fff; }
+  .lead-footer .input { border-radius: 3px; }
+
+  @media (max-width: 1060px) {
+    .lead-bar { grid-template-columns: 1fr; }
+    .lead-bar .lead-head { grid-row: auto; }
+    .lead-bar .lead-title { max-width: none; font-size: 1.3rem; }
+    .lead-bar .lead-ico { width: 40px; height: 40px; }
+    .lead-bar .lead-ico :global(svg) { width: 22px; height: 22px; }
+    .lead-bar .fields { grid-template-columns: 1fr 1fr; }
+    .lead-bar .submit { grid-column: 1 / -1; }
+    .lead-bar .status { grid-column: 1; }
+  }
+  @media (max-width: 480px) { .lead-bar .fields { grid-template-columns: 1fr; } }
 </style>

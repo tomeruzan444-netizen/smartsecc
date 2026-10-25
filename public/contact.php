@@ -60,7 +60,8 @@ $page    = $field('page', 300);
 $consent = ($_POST['consent'] ?? '') === '1';
 
 $digits = preg_replace('/\D+/', '', $phone);
-if ($name === '' || $city === '' || $message === '' || !$consent || strlen($digits) < 9 || strlen($digits) > 13) {
+// "message" is optional: the hero bar and footer forms only ask for name, phone and area
+if ($name === '' || $city === '' || !$consent || strlen($digits) < 9 || strlen($digits) > 13) {
     respond(false, 'validation', 422);
 }
 
@@ -71,7 +72,7 @@ $body = implode("\n", [
     'שם: ' . $name,
     'טלפון: ' . $phone,
     'עיר: ' . $city,
-    'איך נוכל לעזור: ' . $message,
+    'איך נוכל לעזור: ' . ($message !== '' ? $message : '—'),
     '',
     'עמוד: ' . $site . $page,
     'זמן: ' . date('d/m/Y H:i'),

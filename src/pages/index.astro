@@ -1,86 +1,96 @@
 ---
 import Base from '../layouts/Base.astro';
-import Icon from '../components/Icon.astro';
-import LeadForm from '../components/LeadForm.astro';
+import Hero from '../components/Hero.astro';
 import Blocks from '../components/Blocks.astro';
 import SharedSection from '../components/SharedSection.astro';
-import { pages, TOPIC_NAMES, TOPIC_HUB, type Topic } from '../lib/content';
-import { SITE } from '../lib/site';
+import { pages, byPath } from '../lib/content';
+import { imgAttrs } from '../lib/images';
 
 const page = pages.find((p) => p.type === 'home')!;
-const topics: Topic[] = ['cameras', 'alarms', 'intercom', 'other'];
-const services = pages.filter((p) => p.type === 'service');
-const cities = pages.filter((p) => p.type === 'city');
+const U = '/wp-content/uploads';
+
+const serviceCards = [
+  { path: '/התקנת-מצלמות-אבטחה/', title: 'מצלמות אבטחה', img: `${U}/2025/11/מצלמת-אבטחה-מכוונת-1.jpg` },
+  { path: '/התקנת-אזעקה/', title: 'מערכות אזעקה', img: `${U}/2024/08/התקנת-אזעקה-לבית-ולעסק.png` },
+  { path: '/התקנת-אינטרקום/', title: 'אינטרקום', img: `${U}/2024/06/התקנת-אינטרקום-1.png` },
+  { path: '/התקנת-מצלמות-אבטחה-ip/', title: 'מצלמות אבטחה IP', img: `${U}/2024/06/pexels-photo-430208-430208.jpg` },
+];
+
+const infoCards = [
+  { path: '/חוק-מצלמות-אבטחה/', img: `${U}/2025/11/מצלמות-אבטחה-1.jpg` },
+  { path: '/התקנת-קודן-לדלת-כניסה/', img: `${U}/2025/11/אינטרקום-לבניין-1.jpg` },
+  { path: '/החלפת-אינטרקום/', img: `${U}/2025/03/אינפוגרפיה-על-החלפת-אינטרקום-visual-selection-min-1024x754.png` },
+].map((c) => ({ ...c, page: byPath.get(c.path)! })).filter((c) => c.page);
+
+const more = (s: string, n = 150) => (s.length > n ? s.slice(0, s.lastIndexOf(' ', n)) + '…' : s);
 ---
 <Base page={page}>
-  <section class="hero">
-    <div class="container hero-in">
-      <div>
-        <p class="eyebrow"><Icon name="shield" />מצלמות אבטחה · אזעקות · אינטרקום</p>
-        <h1>{page.h1}</h1>
-        <p class="hero-sub">{page.subtitle}. התקנה, תיקון ותחזוקה לבית ולעסק – בפריסה ארצית, עם הצעת מחיר חינם.</p>
-        <div class="hero-cta">
-          <a class="btn btn-cta" href={SITE.phoneHref}><Icon name="phone" />התקשרו להצעת מחיר חינם</a>
-          <a class="btn btn-ghost" href="#services">לכל השירותים</a>
-        </div>
-        <ul class="stats">
-          <li><strong>{new Date().getFullYear() - SITE.foundingYear}+</strong><span>שנות ניסיון</span></li>
-          <li><strong>{cities.length}+</strong><span>ערים ואזורי שירות</span></li>
-          <li><strong>{services.length}</strong><span>סוגי שירותים</span></li>
-        </ul>
-      </div>
-      <LeadForm />
+  <Hero page={page} tagline="התקנת מצלמות אבטחה, מערכות אזעקה ואינטרקום לבית ולעסק – בפריסה ארצית" />
+
+  <section class="container svc" aria-labelledby="svc-title">
+    <h2 class="sec-title" id="svc-title">שירותי האבטחה שלנו</h2>
+    <div class="svc-grid">
+      {serviceCards.map((c) => {
+        const a = imgAttrs(c.img, '(max-width: 640px) 50vw, 280px');
+        return (
+          <a class="svc-card" href={c.path}>
+            <img src={a.src} srcset={a.srcset} sizes={a.sizes} width={a.width} height={a.height} alt={c.title} loading="lazy" decoding="async" />
+            <span class="ribbon">הצעת מחיר חינם</span>
+            <span class="svc-name">{c.title}</span>
+          </a>
+        );
+      })}
     </div>
   </section>
 
   <div class="container">
-    <section class="content card">
+    <section class="content">
       <Blocks blocks={page.blocks} />
     </section>
+  </div>
 
-    <section id="services" class="services" aria-labelledby="services-title">
-      <h2 id="services-title">כל השירותים שלנו</h2>
-      <div class="svc-grid">
-        {topics.map((t) => {
-          const list = services.filter((s) => s.topic === t);
-          if (!list.length) return null;
+  <section class="info" aria-labelledby="info-title">
+    <div class="container">
+      <h2 class="sec-title start" id="info-title">מידע מקצועי</h2>
+      <div class="info-grid">
+        {infoCards.map((c) => {
+          const a = imgAttrs(c.img, '(max-width: 760px) 100vw, 360px');
           return (
-            <nav class="svc card" aria-label={TOPIC_NAMES[t]}>
-              <h3>{t !== 'other' ? <a href={TOPIC_HUB[t]}>{TOPIC_NAMES[t]}</a> : TOPIC_NAMES[t]}</h3>
-              <ul>{list.map((s) => <li><a href={s.path}>{s.label}</a></li>)}</ul>
-            </nav>
+            <article class="info-card">
+              <a href={c.path} tabindex="-1" aria-hidden="true"><img src={a.src} srcset={a.srcset} sizes={a.sizes} width={a.width} height={a.height} alt="" loading="lazy" decoding="async" /></a>
+              <h3><a href={c.path}>{c.page.label}</a></h3>
+              <p>{more(c.page.description)}</p>
+              <a class="read" href={c.path}>קראו עוד&gt;&gt;<span class="visually-hidden"> על {c.page.label}</span></a>
+            </article>
           );
         })}
       </div>
-    </section>
-  </div>
+    </div>
+  </section>
 
   <SharedSection />
 </Base>
 
 <style>
-  .hero { color: #fff; background: radial-gradient(1000px 500px at 90% -20%, rgb(0 187 218 / 50%), transparent 60%), linear-gradient(135deg, var(--navy), var(--navy-2) 55%, #0d4a6b); padding-block: 48px 64px; }
-  .hero-in { display: grid; grid-template-columns: 1.2fr 1fr; gap: 48px; align-items: center; }
-  .eyebrow { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 99px; background: rgb(255 255 255 / 10%); font-weight: 650; margin-bottom: 18px; }
-  .eyebrow :global(svg) { width: 18px; height: 18px; color: var(--brand); }
-  .hero h1 { color: #fff; font-size: clamp(2rem, 1.3rem + 2.8vw, 3.2rem); }
-  .hero-sub { font-size: 1.25rem; color: #d7e6f2; max-width: 40ch; }
-  .hero-cta { display: flex; flex-wrap: wrap; gap: 10px; margin: 26px 0 30px; }
-  .stats { list-style: none; margin: 0; padding: 0; display: flex; gap: 32px; flex-wrap: wrap; }
-  .stats li { display: grid; }
-  .stats strong { font-size: 1.9rem; line-height: 1.1; color: #fff; }
-  .stats span { color: #b9cde0; font-size: .95rem; }
-  .hero :global(.lead) { color: var(--text); }
-  .content { margin-top: -28px; position: relative; padding: clamp(20px, 3vw, 40px); }
-  .services { margin-top: 48px; }
-  .svc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 18px; }
-  .svc { padding: 22px; }
-  .svc h3 { font-size: 1.2rem; }
-  .svc h3 a { color: var(--navy); text-decoration: none; }
-  .svc h3 a:hover { color: var(--brand-ink); }
-  .svc ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
-  .svc li a { display: block; padding: 6px 0; color: var(--text); text-decoration: none; }
-  .svc li a:hover { color: var(--brand-ink); text-decoration: underline; }
-  @media (max-width: 1024px) { .hero-in { grid-template-columns: 1fr; gap: 28px; } }
-  @media (max-width: 640px) { .hero { padding-block: 28px 48px; } .hero-cta .btn { width: 100%; } .stats { gap: 20px; } }
+  .svc { padding-top: 36px; }
+  .svc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+  .svc-card { position: relative; display: block; aspect-ratio: 1 / 1; border-radius: 4px; overflow: hidden; color: #fff; text-decoration: none; box-shadow: 0 4px 14px rgb(0 0 0 / 14%); }
+  .svc-card img { width: 100%; height: 100%; object-fit: cover; transition: transform .35s; }
+  .svc-card::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgb(51 118 184 / 0%) 45%, rgb(31 78 134 / 88%) 100%); }
+  .svc-card:hover img { transform: scale(1.06); }
+  .svc-name { position: absolute; z-index: 1; inset-inline: 0; bottom: 14px; text-align: center; font-size: 1.45rem; font-weight: 800; text-shadow: 0 2px 6px rgb(0 0 0 / 35%); }
+  /* diagonal corner ribbon (top-left in RTL) */
+  .ribbon { position: absolute; z-index: 1; top: 22px; left: -46px; width: 180px; padding: 4px 0; transform: rotate(-45deg); background: var(--cta); color: #fff; font-size: .85rem; font-weight: 800; text-align: center; box-shadow: 0 2px 6px rgb(0 0 0 / 25%); }
+  .content { margin-top: 40px; background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: clamp(20px, 3vw, 40px); }
+  .info { background: #eceef1; margin-top: 48px; padding-block: 44px; border-top: 4px solid #d5d9de; }
+  .info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+  .info-card img { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; border-radius: 2px; }
+  .info-card h3 { margin: 16px 0 6px; font-size: 1.2rem; }
+  .info-card h3 a { color: var(--gray); text-decoration: none; }
+  .info-card h3 a:hover { color: var(--blue-dark); }
+  .info-card p { margin: 0 0 10px; color: #4a5058; font-size: .98rem; }
+  .read { color: var(--cta); font-weight: 800; text-decoration: none; }
+  .read:hover { color: var(--cta-hover); text-decoration: underline; }
+  @media (max-width: 900px) { .svc-grid { grid-template-columns: repeat(2, 1fr); } .info-grid { grid-template-columns: 1fr; } }
+  @media (max-width: 420px) { .svc-grid { gap: 12px; } .svc-name { font-size: 1.15rem; } .ribbon { font-size: .72rem; top: 16px; left: -52px; } }
 </style>

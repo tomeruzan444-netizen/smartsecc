@@ -1,11 +1,19 @@
 :root {
+  /* Smartsec palette (from the Elementor kit): blue #3781C6, cyan #00BBDA, green #1AC730, gray #54595F.
+     Blue/green are a shade deeper where white text sits on them, for WCAG AA contrast. */
+  --blue: #3376b8;
+  --blue-dark: #1f4e86;
+  --blue-bright: #3781c6;
   --brand: #00bbda;
   --brand-ink: #00788c;
   --brand-soft: #e6f8fb;
-  --navy: #0b2540;
-  --navy-2: #12355a;
-  --cta: #15803d;
-  --cta-hover: #116a32;
+  --green: #1ac730;
+  --gray: #54595f;
+  --navy: #1f4e86;
+  --navy-2: #3376b8;
+  --dark: #0f141a;
+  --cta: #149e26;
+  --cta-hover: #128a22;
   --warn-bg: #fff7e6;
   --warn-line: #f0a020;
   --text: #1c2430;
@@ -58,13 +66,18 @@ p { margin: 0 0 1em; }
   transition: background-color .15s, transform .15s, box-shadow .15s;
 }
 .btn:active { transform: translateY(1px); }
-.btn-cta { background: var(--cta); color: #fff; box-shadow: 0 6px 18px rgb(21 128 61 / 28%); }
+.btn-cta { background: var(--cta); color: #fff; box-shadow: 0 0 0 2px rgb(26 199 48 / 35%), 0 6px 18px rgb(20 158 38 / 30%); font-size: 1.2rem; font-weight: 800; }
 .btn-cta:hover { background: var(--cta-hover); color: #fff; }
 .btn-brand { background: var(--brand-ink); color: #fff; }
 .btn-brand:hover { background: var(--navy); color: #fff; }
 .btn-ghost { background: rgb(255 255 255 / 12%); color: #fff; box-shadow: inset 0 0 0 1.5px rgb(255 255 255 / 55%); }
 .btn-ghost:hover { background: rgb(255 255 255 / 22%); color: #fff; }
 .btn svg { width: 20px; height: 20px; flex: none; }
+
+/* Section title with dotted rules on both sides */
+.sec-title { display: flex; align-items: center; gap: 18px; font-size: clamp(1.4rem, 1.1rem + 1vw, 1.8rem); color: var(--blue-dark); margin: 0 0 28px; }
+.sec-title::before, .sec-title::after { content: ''; flex: 1; border-top: 2px dotted #8c97a3; }
+.sec-title.start::before { display: none; }
 
 /* Cards & surfaces */
 .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }

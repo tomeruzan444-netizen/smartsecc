@@ -52,6 +52,16 @@ export const TOPIC_HUB: Record<Topic, string> = {
   other: '/',
 };
 
+// Hero background per topic – all photos come from the site's own media library
+const HERO: Record<Topic | 'default', string> = {
+  cameras: '/wp-content/uploads/2024/06/התקנת-מצלמות-אבטחה.png',
+  alarms: '/wp-content/uploads/2024/08/התקנת-אזעקה-לבית-ולעסק.png',
+  intercom: '/wp-content/uploads/2024/06/התקנת-אינטרקום-1.png',
+  other: '/wp-content/uploads/2024/06/pexels-photo-430208-430208.jpg',
+  default: '/wp-content/uploads/2024/06/pexels-photo-430208-430208.jpg',
+};
+export const heroImage = (p: Page) => (p.type === 'home' ? HERO.cameras : HERO[p.topic ?? 'default']);
+
 const cityPages = pages.filter((p) => p.type === 'city');
 const servicePages = pages.filter((p) => p.type === 'service');
 
@@ -100,9 +110,15 @@ export function sidebarFor(p: Page) {
       ].filter(Boolean) as { title: string; links: { href: string; text: string }[]; more?: { href: string; text: string } }[],
     };
   }
+  // about / contact / areas / projects / legal: main services, top areas and the other key pages
+  const hubs = (['cameras', 'alarms', 'intercom'] as Topic[]).map((t) => byPath.get(TOPIC_HUB[t])!).filter(Boolean);
+  const keyPages = pages.filter((x) => ['about', 'contact', 'areas', 'projects', 'article', 'legal'].includes(x.type) && x.path !== p.path);
+  const regions = cityPages.filter((c) => ['תל אביב', 'ירושלים', 'חיפה', 'באר שבע', 'ראשון לציון', 'נתניה', 'פתח תקווה', 'רמת גן', 'חולון', 'הרצליה', 'מרכז', 'צפון', 'דרום'].includes(c.city!) && c.topic === 'cameras');
   return {
     groups: [
-      { title: 'השירותים שלנו', links: servicePages.filter((s) => s.topic !== 'other').slice(0, 10).map(linkOf) },
+      { title: 'השירותים המרכזיים שלנו', links: [...hubs, ...servicePages.filter((s) => !hubs.includes(s) && s.topic !== 'other').slice(0, 7)].map(linkOf) },
+      { title: 'אזורי שירות מובילים', links: regions.map(linkOf), more: { href: '/אזורי-שירות/', text: 'לכל אזורי השירות' } },
+      { title: 'עמודים חשובים', links: keyPages.map(linkOf) },
     ],
   };
 }

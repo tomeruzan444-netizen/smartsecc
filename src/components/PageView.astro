@@ -1,78 +1,33 @@
 ---
-// Layout for every migrated inner page: hero + lead form, article with custom sidebar,
-// then the shared section that WordPress appended to all pages.
-import Icon from './Icon.astro';
-import Breadcrumbs from './Breadcrumbs.astro';
-import LeadForm from './LeadForm.astro';
+// Layout for every migrated inner page: photo hero + lead bar, article with a custom
+// sidebar, then the shared section that WordPress appended to all pages.
+import Hero from './Hero.astro';
 import Blocks from './Blocks.astro';
 import Toc from './Toc.astro';
 import Sidebar from './Sidebar.astro';
 import SharedSection from './SharedSection.astro';
-import { breadcrumbs, type Page } from '../lib/content';
-import { SITE } from '../lib/site';
+import type { Page } from '../lib/content';
 
 interface Props { page: Page }
 const { page } = Astro.props;
-const minimal = page.type === 'legal';
 const showToc = page.hasToc || page.toc.length >= 4;
 ---
-<section class:list={['hero', { 'hero-min': minimal }]}>
-  <div class="container hero-in">
-    <div class="hero-copy">
-      <Breadcrumbs items={breadcrumbs(page)} />
-      <h1>{page.h1}</h1>
-      {page.subtitle && <p class="hero-sub">{page.subtitle}</p>}
-      {!minimal && (
-        <>
-          <ul class="badges">
-            <li><Icon name="shield" />מומחים מאז {SITE.foundingYear}</li>
-            <li><Icon name="check" />הצעת מחיר חינם</li>
-            <li><Icon name="pin" />{page.city ? `שירות ב${page.city} והסביבה` : 'פריסה ארצית'}</li>
-          </ul>
-          <div class="hero-cta">
-            <a class="btn btn-cta" href={SITE.phoneHref}><Icon name="phone" />התקשרו להצעת מחיר חינם</a>
-            <a class="btn btn-ghost" href={SITE.phoneHref}>התקשרו עכשיו והתייעצו איתנו</a>
-          </div>
-        </>
-      )}
-    </div>
-    {!minimal && <div class="hero-form"><LeadForm city={page.city} /></div>}
-  </div>
-</section>
+<Hero page={page} />
 
-<div class:list={['container layout', { 'no-side': minimal }]}>
+<div class="container layout">
   <article class="content">
     {showToc && <Toc items={page.toc} variant="inline" />}
     <Blocks blocks={page.blocks} />
   </article>
-  {!minimal && <Sidebar page={page} />}
+  <Sidebar page={page} />
 </div>
 
-{!minimal && <SharedSection />}
+<SharedSection />
 
 <style>
-  .hero { position: relative; color: #fff; background: radial-gradient(1200px 400px at 85% -10%, rgb(0 187 218 / 45%), transparent 60%), linear-gradient(135deg, var(--navy) 0%, var(--navy-2) 60%, #0d4a6b 100%); padding-block: 28px 44px; overflow: hidden; }
-  .hero::after { content: ''; position: absolute; inset: auto 0 0; height: 40px; background: linear-gradient(transparent, rgb(0 0 0 / 6%)); pointer-events: none; }
-  .hero-in { display: grid; grid-template-columns: 1.15fr 1fr; gap: 40px; align-items: center; }
-  .hero-min .hero-in { grid-template-columns: 1fr; }
-  .hero h1 { color: #fff; margin: 14px 0 10px; }
-  .hero-sub { font-size: 1.2rem; color: #d7e6f2; margin-bottom: 18px; }
-  .badges { list-style: none; margin: 0 0 22px; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
-  .badges li { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 99px; background: rgb(255 255 255 / 10%); font-weight: 600; font-size: .95rem; }
-  .badges :global(svg) { width: 18px; height: 18px; color: var(--brand); }
-  .hero-cta { display: flex; flex-wrap: wrap; gap: 10px; }
-  .hero-form :global(.lead) { color: var(--text); }
-  .layout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 40px; padding-top: 40px; align-items: start; }
-  .layout.no-side { grid-template-columns: minmax(0, 820px); justify-content: center; }
-  .content { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: clamp(20px, 3vw, 40px); min-width: 0; }
-  @media (max-width: 1024px) {
-    .hero-in { grid-template-columns: 1fr; gap: 24px; }
-    .layout { grid-template-columns: 1fr; }
-  }
-  @media (max-width: 640px) {
-    .hero { padding-block: 18px 28px; }
-    .hero-cta .btn-ghost { display: none; }
-    .hero-cta .btn { width: 100%; }
-    .content { border-radius: 0; border-inline: 0; margin-inline: -16px; }
-  }
+  .layout { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 36px; padding-top: 40px; align-items: start; }
+  .content { background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: clamp(20px, 3vw, 40px); min-width: 0; box-shadow: 0 1px 3px rgb(0 0 0 / 5%); }
+  .content :global(h2) { color: var(--blue-dark); }
+  @media (max-width: 1024px) { .layout { grid-template-columns: 1fr; } }
+  @media (max-width: 640px) { .content { border-radius: 0; border-inline: 0; margin-inline: -16px; } }
 </style>
