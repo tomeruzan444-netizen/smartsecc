@@ -17,9 +17,9 @@ const sub = tagline ?? (page.subtitle && !page.h1.includes(page.subtitle.split('
   <img class="hero-bg" src={img.src} srcset={img.srcset} sizes="100vw" width={img.width} height={img.height} alt="" fetchpriority="high" decoding="async" />
   <div class="container hero-copy">
     {!isHome && <Breadcrumbs items={breadcrumbs(page)} />}
+    {/* the h1 text stays identical to WordPress (incl. the dash); the dash only starts a new visual line */}
     <h1>
-      <span class="h1-main">{main}</span>
-      {rest.length > 0 && <span class="h1-rest">{rest.join(' – ')}</span>}
+      <span class="h1-main">{main}</span>{rest.length > 0 && <span class="h1-rest"><span class="dash"> – </span>{rest.join(' – ')}</span>}
     </h1>
     {sub && <p class="hero-sub">{sub}</p>}
   </div>
@@ -41,6 +41,7 @@ const sub = tagline ?? (page.subtitle && !page.h1.includes(page.subtitle.split('
   h1 { margin: 10px 0 8px; color: var(--blue-dark); max-width: 760px; }
   .h1-main { display: block; font-size: clamp(2rem, 1.3rem + 2.6vw, 3.3rem); font-weight: 800; line-height: 1.12; }
   .h1-rest { display: block; font-size: clamp(1.3rem, 1rem + 1.2vw, 2rem); font-weight: 700; color: var(--blue); margin-top: 6px; }
+  .dash { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
   .hero-sub { font-size: 1.3rem; font-weight: 700; color: var(--text); margin: 0; max-width: 640px; }
   .hero-bar { background: rgb(84 89 95 / 88%); backdrop-filter: blur(4px); padding-block: 14px; }
   @media (max-width: 760px) {
