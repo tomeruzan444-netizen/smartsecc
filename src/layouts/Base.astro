@@ -55,13 +55,16 @@ const hero = page ? imgAttrs(heroImage(page), '100vw') : null;
     <link rel="apple-touch-icon" href="/wp-content/uploads/2024/06/cropped-אייקון-סמארטסק-min-180x180.png" />
     <link rel="preload" href={fontHebrew} as="font" type="font/woff2" crossorigin />
     <link rel="preload" href={fontLatin} as="font" type="font/woff2" crossorigin />
-    {/* font-display: optional – the preloaded font is used when it arrives within the first paint,
-        otherwise the fallback stays for that view; either way text never re-flows (zero CLS) */}
+    {/* font-display: swap so every visitor ends up with Assistant for all text (one consistent font).
+        "Assistant Fallback" is Arial scaled to Assistant's Hebrew glyph widths/metrics, so the swap
+        barely moves anything (measured with fontTools: avg Hebrew advance 0.461em vs 0.5015em) */}
     <style is:global set:html={`
-      @font-face { font-family: 'Assistant Variable'; font-style: normal; font-display: optional; font-weight: 200 800;
-        src: url(${fontHebrew}) format('woff2-variations'); unicode-range: U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F; }
-      @font-face { font-family: 'Assistant Variable'; font-style: normal; font-display: optional; font-weight: 200 800;
-        src: url(${fontLatin}) format('woff2-variations'); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+      @font-face { font-family: 'Assistant Variable'; font-style: normal; font-display: swap; font-weight: 200 800;
+        src: url(${fontHebrew}) format('woff2-variations'), url(${fontHebrew}) format('woff2'); unicode-range: U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F; }
+      @font-face { font-family: 'Assistant Variable'; font-style: normal; font-display: swap; font-weight: 200 800;
+        src: url(${fontLatin}) format('woff2-variations'), url(${fontLatin}) format('woff2'); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+      @font-face { font-family: 'Assistant Fallback'; src: local('Arial'), local('ArialMT'), local('Arial Hebrew');
+        size-adjust: 91.9%; ascent-override: 111%; descent-override: 31.2%; line-gap-override: 0%; }
     `} />
     {hero?.srcset && <link rel="preload" as="image" imagesrcset={hero.srcset} imagesizes="100vw" fetchpriority="high" />}
     <link rel="alternate" type="text/plain" title="llms.txt" href="/llms.txt" />

@@ -7,6 +7,8 @@ export default defineConfig({
   build: {
     format: 'directory',
     inlineStylesheets: 'always',
+    // Hostinger does not serve folders starting with "_" (default is "_astro")
+    assets: 'assets',
   },
   compressHTML: true,
   // internal links are fetched on hover/touch so the next page opens instantly
