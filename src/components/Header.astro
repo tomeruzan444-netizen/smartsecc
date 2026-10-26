@@ -92,7 +92,9 @@ const short = (t: string) => t.split(/\s+[–-]\s+/)[0];
   .menu-item > a { padding: 24px 9px; color: #fff; font-weight: 700; text-decoration: none; white-space: nowrap; font-size: 1.02rem; border-bottom: 3px solid transparent; }
   .menu-item > a:hover, .menu-item.active > a { border-bottom-color: var(--brand); }
   .menu-item.active > a { color: #e3f9fd; }
-  .sub-toggle { border: 0; background: none; padding: 6px 2px; margin-inline-start: -6px; color: #fff; cursor: pointer; display: grid; place-items: center; }
+  /* ≥24px tap target with clear spacing from the link (WCAG 2.2 target-size) */
+  .sub-toggle { border: 0; background: none; width: 28px; height: 36px; padding: 0; margin-inline-start: 0; border-radius: 6px; color: #fff; cursor: pointer; display: grid; place-items: center; }
+  .sub-toggle:hover { background: rgb(255 255 255 / 12%); }
   .sub-toggle :global(svg) { width: 18px; height: 18px; transition: transform .2s; }
   .sub { position: absolute; top: 100%; inset-inline-start: 0; min-width: 280px; list-style: none; margin: 0; padding: 8px; background: #fff; border-top: 3px solid var(--brand); border-radius: 0 0 12px 12px; box-shadow: 0 14px 34px rgb(0 0 0 / 18%); opacity: 0; visibility: hidden; transform: translateY(6px); transition: .16s; }
   .sub a { display: block; padding: 9px 12px; border-radius: 8px; color: var(--text); text-decoration: none; font-weight: 600; }
