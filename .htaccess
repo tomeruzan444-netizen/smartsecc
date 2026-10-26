@@ -17,7 +17,8 @@ ErrorDocument 404 /404.html
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_URI} !/$
   RewriteCond %{REQUEST_URI} !\.[a-zA-Z0-9]{2,5}$
-  RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1/ [L,R=301,NE]
+  # (no NE flag: Apache percent-encodes the Hebrew path in the Location header, as the HTTP spec requires)
+  RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1/ [L,R=301]
 
   # WordPress author archive (was referenced in the old schema) -> about page
   RewriteRule ^author(/.*)?$ /%D7%90%D7%95%D7%93%D7%95%D7%AA/ [L,R=301,NE]
