@@ -114,11 +114,17 @@ const short = (t: string) => t.split(/\s+[–-]\s+/)[0];
   .burger :global(.i-close), .open .burger :global(.i-open) { display: none; }
   .open .burger :global(.i-close) { display: block; }
 
-  @media (max-width: 1240px) {
-    .menu-item > a { padding: 24px 6px; font-size: .95rem; }
+  @media (max-width: 1480px) {
+    .bar { gap: 16px; }
+    .menu-item > a { padding: 24px 7px; }
     .phone-txt small { display: none; }
   }
-  @media (max-width: 1060px) {
+  @media (max-width: 1400px) {
+    .menu-item > a { padding: 24px 5px; font-size: .93rem; }
+    .sub-toggle { width: 24px; }
+    .phone-txt strong { font-size: 1.15rem; }
+  }
+  @media (max-width: 1200px) {
     .burger { display: grid; }
     .bar { gap: 12px; }
     .logo { align-self: center; margin-top: 0; padding: 6px 10px; border-radius: 12px; }
